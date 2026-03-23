@@ -1,47 +1,17 @@
 [
   {
     "id": "1",
-    "title": "SaaS Dashboard",
-    "description": "A full-stack analytics platform with real-time data, custom reporting, and role-based access control.",
-    "tags": [
-      "Flask",
-      "PostgreSQL",
-      "Tailwind",
-      "Docker"
-    ],
-    "live_url": "https://example.com",
-    "github_url": "https://github.com",
-    "thumbnail_url": "file:///C:/Users/mosta/Pictures/Screenshots/Screenshot%202026-03-09%20232030.png",
-    "order_index": 0
-  },
-  {
-    "id": "2",
-    "title": "Internal CRM Tool",
-    "description": "Custom CRM built for a logistics company — automated pipelines, email triggers, and a clean Jinja frontend.",
+    "title": "edhub",
+    "description": "A full-stack local educational platform for physics students.",
     "tags": [
       "Django",
-      "SQLite",
-      "SCSS",
-      "Nginx"
+      "SQL",
+      "GIT/GITHUB",
+      "CI/CD",
+      "REST"
     ],
-    "live_url": "https://example.com",
-    "github_url": "https://github.com",
-    "thumbnail_url": "",
-    "order_index": 1
-  },
-  {
-    "id": "3",
-    "title": "Automation Engine",
-    "description": "A background job system that processes 50k+ records nightly, sends alerts, and syncs with third-party APIs.",
-    "tags": [
-      "Python",
-      "Redis",
-      "Gunicorn",
-      "CI/CD"
-    ],
-    "live_url": "",
-    "github_url": "https://github.com",
-    "thumbnail_url": "",
-    "order_index": 2
+    "github_url": "https://github.com/Ahmed900Wael/edhub",
+    "thumbnail_url": "https://raw.githubusercontent.com/Ahmed900Wael/edhub/refs/heads/main/landing.png",
+    "order_index": 0
   }
 ]
