@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Projects Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    background: #0d1117;
+    color: #e5e2e1;
+    font-family: 'Space Grotesk', sans-serif;
+    min-height: 100vh;
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  input, textarea {
+    background: #161b22;
+    border: 1px solid #30363d;
+    color: #e5e2e1;
+    padding: 10px 14px;
+    width: 100%;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    border-radius: 4px;
+  }
+  input:focus, textarea:focus { border-color: #4edea3; }
+  textarea { resize: vertical; min-height: 80px; }
+  label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #8b949e; display: block; margin-bottom: 6px; font-weight: 600; }
+  .btn {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 10px 20px;
+    border: 1px solid #30363d;
+    background: transparent;
+    color: #e5e2e1;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn:hover { border-color: #4edea3; color: #4edea3; }
+  .btn-primary { background: #4edea3; color: #003824; border-color: #4edea3; }
+  .btn-primary:hover { background: #6ffbbe; border-color: #6ffbbe; color: #003824; }
+  .btn-danger { border-color: #f85149; color: #f85149; }
+  .btn-danger:hover { background: rgba(248,81,73,0.1); }
+  .card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 1.25rem;
+    transition: border-color 0.2s;
+  }
+  .card.dragging { opacity: 0.4; border-color: #4edea3; }
+  .card.drag-over { border-color: #4edea3; box-shadow: 0 0 0 2px rgba(78,222,163,0.2); }
+  .drag-handle {
+    cursor: grab;
+    color: #3c4a42;
+    transition: color 0.2s;
+    user-select: none;
+  }
+  .drag-handle:hover { color: #4edea3; }
+  .tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    background: rgba(78,222,163,0.08);
+    border: 1px solid rgba(78,222,163,0.2);
+    color: #4edea3;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    border-radius: 4px;
+  }
+  .tag-pill button {
+    background: none;
+    border: none;
+    color: #4edea3;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    font-size: 14px;
+    opacity: 0.6;
+  }
+  .tag-pill button:hover { opacity: 1; }
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .modal {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 2rem;
+  }
+  .toast {
+    position: fixed;
+    bottom: 2rem; right: 2rem;
+    background: #1c2128;
+    border: 1px solid #4edea3;
+    color: #4edea3;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    z-index: 100;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  #empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #3c4a42;
+  }
+  .field-group { margin-bottom: 1.25rem; }
+</style>
+</head>
+<body>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span class="material-symbols-outlined" style="font-size:16px;">check_circle</span>
+  <span id="toast-msg">Saved</span>
+</div>
+
+<!-- Header -->
+<header style="border-bottom:1px solid #21262d; padding: 1.25rem 2rem; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; background:#0d1117; z-index:40;">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <span class="mono" style="color:#4edea3;font-size:13px;">❯</span>
+    <span style="font-weight:700;font-size:16px;letter-spacing:-0.02em;">Projects Admin</span>
+    <span class="mono" style="font-size:11px;color:#8b949e;" id="project-count">0 projects</span>
+  </div>
+  <div style="display:flex;gap:10px;">
+    <button class="btn" onclick="importJSON()">
+      <span class="material-symbols-outlined" style="font-size:16px;">upload</span> Import
+    </button>
+    <button class="btn btn-primary" onclick="exportJSON()">
+      <span class="material-symbols-outlined" style="font-size:16px;">download</span> Export JSON
+    </button>
+  </div>
+</header>
+
+<main style="max-width:800px;margin:0 auto;padding:2rem;">
+
+  <!-- Add new -->
+  <div style="margin-bottom:2rem;display:flex;justify-content:space-between;align-items:center;">
+    <h2 style="font-size:13px;text-transform:uppercase;letter-spacing:0.1em;color:#8b949e;">
+      Drag to reorder · Click to edit
+    </h2>
+    <button class="btn btn-primary" onclick="openModal()">
+      <span class="material-symbols-outlined" style="font-size:16px;">add</span> Add Project
+    </button>
+  </div>
+
+  <!-- Project list -->
+  <div id="project-list"></div>
+  <div id="empty-state" style="display:none;">
+    <span class="material-symbols-outlined" style="font-size:48px;display:block;margin-bottom:1rem;">folder_open</span>
+    <p style="font-size:14px;">No projects yet. Add your first one.</p>
+  </div>
+
+  <!-- Hidden file input -->
+  <input type="file" id="file-input" accept=".json" style="display:none;" onchange="handleImport(event)"/>
+</main>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal" style="display:none;" onclick="closeModalOutside(event)">
+  <div class="modal" id="modal-inner">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+      <h3 style="font-size:18px;font-weight:700;letter-spacing:-0.02em;" id="modal-title">Add Project</h3>
+      <button class="btn" onclick="closeModal()" style="padding:6px 10px;">
+        <span class="material-symbols-outlined" style="font-size:18px;">close</span>
+      </button>
+    </div>
+
+    <div class="field-group">
+      <label>Title *</label>
+      <input type="text" id="f-title" placeholder="My Awesome Project"/>
+    </div>
+    <div class="field-group">
+      <label>Description</label>
+      <textarea id="f-desc" placeholder="What did you build and why does it matter?"></textarea>
+    </div>
+    <div class="field-group">
+      <label>Thumbnail URL</label>
+      <input type="url" id="f-thumb" placeholder="https://..."/>
+    </div>
+    <div class="field-group">
+      <label>Live URL</label>
+      <input type="url" id="f-live" placeholder="https://..."/>
+    </div>
+    <div class="field-group">
+      <label>GitHub URL</label>
+      <input type="url" id="f-github" placeholder="https://github.com/..."/>
+    </div>
+    <div class="field-group">
+      <label>Tech Stack Tags</label>
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <input type="text" id="f-tag-input" placeholder="e.g. Flask" style="flex:1;" onkeydown="tagKeydown(event)"/>
+        <button class="btn" onclick="addTag()" style="white-space:nowrap;">Add</button>
+      </div>
+      <div id="f-tags" style="display:flex;flex-wrap:wrap;gap:6px;min-height:28px;"></div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:1.5rem;justify-content:flex-end;">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveProject()">
+        <span class="material-symbols-outlined" style="font-size:16px;">save</span> Save
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+let projects = [];
+let editingId = null;
+let currentTags = [];
+let dragSrcIdx = null;
+
+function loadFromStorage() {
+  try {
+    const raw = localStorage.getItem('portfolio_projects');
+    if (raw) projects = JSON.parse(raw);
+  } catch(e) { projects = []; }
+}
+
+function saveToStorage() {
+  localStorage.setItem('portfolio_projects', JSON.stringify(projects));
+}
+
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+
+function render() {
+  const list = document.getElementById('project-list');
+  const empty = document.getElementById('empty-state');
+  const count = document.getElementById('project-count');
+
+  count.textContent = projects.length + ' project' + (projects.length !== 1 ? 's' : '');
+
+  if (projects.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  list.innerHTML = '';
+  projects.forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.marginBottom = '12px';
+    card.draggable = true;
+    card.dataset.idx = i;
+
+    card.innerHTML = `
+      <div style="display:flex;align-items:flex-start;gap:12px;">
+        <span class="material-symbols-outlined drag-handle" style="margin-top:2px;font-size:20px;">drag_indicator</span>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <span style="font-weight:700;font-size:15px;letter-spacing:-0.01em;">${p.title}</span>
+            ${p.live_url ? `<span style="font-size:10px;color:#4edea3;font-family:'JetBrains Mono',monospace;background:rgba(78,222,163,0.08);border:1px solid rgba(78,222,163,0.2);padding:2px 8px;border-radius:3px;">live</span>` : ''}
+          </div>
+          ${p.description ? `<p style="font-size:13px;color:#8b949e;margin:0 0 8px;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.description}</p>` : ''}
+          <div style="display:flex;flex-wrap:wrap;gap:5px;">
+            ${(p.tags||[]).map(t=>`<span class="tag-pill">${t}</span>`).join('')}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0;">
+          <button class="btn" onclick="editProject('${p.id}')" style="padding:7px 12px;">
+            <span class="material-symbols-outlined" style="font-size:16px;">edit</span>
+          </button>
+          <button class="btn btn-danger" onclick="deleteProject('${p.id}')" style="padding:7px 12px;">
+            <span class="material-symbols-outlined" style="font-size:16px;">delete</span>
+          </button>
+        </div>
+      </div>`;
+
+    card.addEventListener('dragstart', e => {
+      dragSrcIdx = i;
+      card.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    card.addEventListener('dragend', () => card.classList.remove('dragging'));
+    card.addEventListener('dragover', e => { e.preventDefault(); card.classList.add('drag-over'); });
+    card.addEventListener('dragleave', () => card.classList.remove('drag-over'));
+    card.addEventListener('drop', e => {
+      e.preventDefault();
+      card.classList.remove('drag-over');
+      if (dragSrcIdx === null || dragSrcIdx === i) return;
+      const moved = projects.splice(dragSrcIdx, 1)[0];
+      projects.splice(i, 0, moved);
+      projects.forEach((p, idx) => p.order_index = idx);
+      saveToStorage();
+      render();
+      showToast('Order saved');
+    });
+
+    list.appendChild(card);
+  });
+}
+
+function openModal(id) {
+  editingId = id || null;
+  currentTags = [];
+  document.getElementById('modal-title').textContent = id ? 'Edit Project' : 'Add Project';
+  document.getElementById('f-title').value = '';
+  document.getElementById('f-desc').value = '';
+  document.getElementById('f-thumb').value = '';
+  document.getElementById('f-live').value = '';
+  document.getElementById('f-github').value = '';
+  document.getElementById('f-tag-input').value = '';
+  document.getElementById('f-tags').innerHTML = '';
+
+  if (id) {
+    const p = projects.find(x => x.id === id);
+    if (p) {
+      document.getElementById('f-title').value = p.title || '';
+      document.getElementById('f-desc').value = p.description || '';
+      document.getElementById('f-thumb').value = p.thumbnail_url || '';
+      document.getElementById('f-live').value = p.live_url || '';
+      document.getElementById('f-github').value = p.github_url || '';
+      currentTags = [...(p.tags || [])];
+      renderTags();
+    }
+  }
+
+  document.getElementById('modal').style.display = 'flex';
+  setTimeout(() => document.getElementById('f-title').focus(), 50);
+}
+
+function editProject(id) { openModal(id); }
+
+function closeModal() { document.getElementById('modal').style.display = 'none'; }
+function closeModalOutside(e) { if (e.target.id === 'modal') closeModal(); }
+
+function addTag() {
+  const input = document.getElementById('f-tag-input');
+  const val = input.value.trim();
+  if (!val || currentTags.includes(val)) return;
+  currentTags.push(val);
+  input.value = '';
+  renderTags();
+}
+
+function tagKeydown(e) { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }
+
+function removeTag(tag) {
+  currentTags = currentTags.filter(t => t !== tag);
+  renderTags();
+}
+
+function renderTags() {
+  document.getElementById('f-tags').innerHTML = currentTags
+    .map(t => `<span class="tag-pill">${t}<button onclick="removeTag('${t}')">×</button></span>`)
+    .join('');
+}
+
+function saveProject() {
+  const title = document.getElementById('f-title').value.trim();
+  if (!title) { document.getElementById('f-title').focus(); return; }
+
+  const data = {
+    title,
+    description: document.getElementById('f-desc').value.trim(),
+    thumbnail_url: document.getElementById('f-thumb').value.trim(),
+    live_url: document.getElementById('f-live').value.trim(),
+    github_url: document.getElementById('f-github').value.trim(),
+    tags: [...currentTags],
+  };
+
+  if (editingId) {
+    const idx = projects.findIndex(p => p.id === editingId);
+    if (idx !== -1) projects[idx] = { ...projects[idx], ...data };
+  } else {
+    projects.push({ id: genId(), order_index: projects.length, ...data });
+  }
+
+  saveToStorage();
+  render();
+  closeModal();
+  showToast(editingId ? 'Project updated' : 'Project added');
+}
+
+function deleteProject(id) {
+  if (!confirm('Delete this project?')) return;
+  projects = projects.filter(p => p.id !== id);
+  projects.forEach((p, i) => p.order_index = i);
+  saveToStorage();
+  render();
+  showToast('Project deleted');
+}
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(projects, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'projects.json';
+  a.click();
+  showToast('projects.json exported');
+}
+
+function importJSON() { document.getElementById('file-input').click(); }
+
+function handleImport(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!Array.isArray(data)) throw new Error('Invalid format');
+      projects = data;
+      saveToStorage();
+      render();
+      showToast(data.length + ' projects imported');
+    } catch(err) {
+      alert('Invalid JSON file');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+loadFromStorage();
+render();
+</script>
+</body>
+</html>

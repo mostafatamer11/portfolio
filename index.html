@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Editorial Engineer | Portfolio</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+<script>
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "surface-container": "#201f1f",
+          "on-secondary-fixed": "#002113",
+          "surface-container-lowest": "#0e0e0e",
+          "on-error-container": "#ffdad6",
+          "surface-container-highest": "#353534",
+          "error": "#ffb4ab",
+          "tertiary-fixed-dim": "#ffb3af",
+          "surface-container-low": "#1c1b1b",
+          "on-secondary": "#013824",
+          "secondary-fixed": "#baeed1",
+          "on-secondary-fixed-variant": "#1e4f3a",
+          "on-background": "#e5e2e1",
+          "outline-variant": "#3c4a42",
+          "background": "#131313",
+          "outline": "#86948a",
+          "on-tertiary-fixed-variant": "#842225",
+          "surface-dim": "#131313",
+          "on-surface-variant": "#bbcabf",
+          "surface-variant": "#353534",
+          "surface-bright": "#3a3939",
+          "surface-container-high": "#2a2a2a",
+          "primary-fixed-dim": "#4edea3",
+          "on-secondary-container": "#91c4a8",
+          "surface": "#131313",
+          "on-primary-fixed-variant": "#005236",
+          "secondary-fixed-dim": "#9ed2b5",
+          "secondary": "#9ed2b5",
+          "on-primary-fixed": "#002113",
+          "inverse-primary": "#006c49",
+          "inverse-surface": "#e5e2e1",
+          "tertiary": "#ffb3af",
+          "on-primary-container": "#00422b",
+          "surface-tint": "#4edea3",
+          "tertiary-container": "#fc7c78",
+          "primary": "#4edea3",
+          "tertiary-fixed": "#ffdad7",
+          "inverse-on-surface": "#313030",
+          "primary-fixed": "#6ffbbe",
+          "on-tertiary-fixed": "#410005",
+          "on-primary": "#003824",
+          "on-error": "#690005",
+          "on-tertiary": "#650911",
+          "error-container": "#93000a",
+          "primary-container": "#10b981",
+          "secondary-container": "#21523c",
+          "on-surface": "#e5e2e1",
+          "on-tertiary-container": "#711419"
+        },
+        fontFamily: {
+          "headline": ["Space Grotesk"],
+          "body": ["Manrope"],
+          "label": ["Space Grotesk"],
+          "mono": ["JetBrains Mono"]
+        },
+        borderRadius: {
+          "DEFAULT": "0.125rem",
+          "lg": "0.25rem",
+          "xl": "0.5rem",
+          "full": "0.75rem"
+        },
+      },
+    },
+  }
+</script>
+
+<style>
+  /* ── Base ── */
+  body {
+    background-color: #131313;
+    background-image: radial-gradient(#4edea308 1px, transparent 0);
+    background-size: 40px 40px;
+    background-attachment: fixed;
+    scroll-behavior: smooth;
+  }
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  .glass-card {
+    background: rgba(32, 31, 31, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(134, 148, 138, 0.1);
+  }
+  .glow-hover:hover {
+    box-shadow: 0 0 40px rgba(16, 185, 129, 0.15);
+  }
+
+  /* ── Terminal ── */
+  .term-wrap {
+    background: #0d1117;
+    border-radius: 10px;
+    overflow: hidden;
+    font-family: 'JetBrains Mono', monospace;
+    width: 100%;
+    aspect-ratio: 4/3;
+    max-height: 480px;
+    display: flex;
+    flex-direction: column;
+  }
+  .term-bar {
+    background: #1c2128;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
+  }
+  .dot { width: 11px; height: 11px; border-radius: 50%; }
+  .dot-r { background: #ff5f57; }
+  .dot-y { background: #febc2e; }
+  .dot-g { background: #28c840; }
+  .term-title { color: #8b949e; font-size: 12px; margin-left: 8px; }
+  .term-body {
+    padding: 16px 20px;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .line {
+    font-size: 13px;
+    line-height: 1.7;
+    white-space: pre;
+    opacity: 0;
+    min-height: 22px;
+  }
+  .line.visible { opacity: 1; }
+  .prompt { color: #3fb950; }
+  .cmd    { color: #e6edf3; }
+  .out    { color: #8b949e; }
+  .teal   { color: #39d8c8; }
+  .amber  { color: #e3b341; }
+  .blue   { color: #79c0ff; }
+  .green  { color: #3fb950; }
+  .cursor {
+    display: inline-block;
+    width: 7px;
+    height: 13px;
+    background: #39d8c8;
+    vertical-align: middle;
+    animation: blink 1s step-end infinite;
+    margin-left: 1px;
+  }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+  /* ── Projects carousel ── */
+  .projects-track {
+    display: flex;
+    gap: 2rem;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+  }
+  .project-card {
+    flex: 0 0 420px;
+    background: rgba(32, 31, 31, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(134, 148, 138, 0.1);
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: border-color 0.3s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .project-card:hover {
+    border-color: rgba(78, 222, 163, 0.35);
+    transform: translateY(-6px);
+    box-shadow: 0 0 48px rgba(16, 185, 129, 0.12);
+  }
+  .project-thumb {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+    display: block;
+    background: #1c2128;
+  }
+  .project-thumb-placeholder {
+    width: 100%;
+    height: 220px;
+    background: linear-gradient(135deg, #1c2128 0%, #0d1117 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #3c4a42;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(134, 148, 138, 0.08);
+  }
+  .project-body { padding: 1.5rem; }
+  .project-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem; }
+  .project-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 3px 10px;
+    background: rgba(78, 222, 163, 0.08);
+    border: 1px solid rgba(78, 222, 163, 0.18);
+    color: #4edea3;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .project-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #e5e2e1;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+  }
+  .project-desc {
+    font-size: 0.875rem;
+    color: #bbcabf;
+    line-height: 1.65;
+    margin-bottom: 1.25rem;
+  }
+  .project-links { display: flex; gap: 0.75rem; }
+  .project-link {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 8px 16px;
+    border: 1px solid rgba(134, 148, 138, 0.2);
+    color: #bbcabf;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .project-link:hover       { border-color: #4edea3; color: #4edea3; }
+  .project-link.primary     { background: #4edea3; color: #003824; border-color: #4edea3; }
+  .project-link.primary:hover { background: #6ffbbe; border-color: #6ffbbe; color: #003824; }
+  .carousel-btn {
+    width: 48px;
+    height: 48px;
+    border: 1px solid rgba(134, 148, 138, 0.2);
+    background: rgba(32, 31, 31, 0.8);
+    color: #bbcabf;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+  .carousel-btn:hover    { border-color: #4edea3; color: #4edea3; }
+  .carousel-btn:disabled { opacity: 0.25; cursor: not-allowed; border-color: rgba(134,148,138,0.1); color: #3c4a42; }
+  .carousel-dots { display: flex; gap: 6px; align-items: center; }
+  .carousel-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #3c4a42;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  .carousel-dot.active { background: #4edea3; width: 20px; border-radius: 3px; }
+  .carousel-fade-right {
+    pointer-events: none;
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 80px;
+    background: linear-gradient(to left, #1c1b1b, transparent);
+    z-index: 2;
+  }
+  .carousel-fade-left {
+    pointer-events: none;
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 80px;
+    background: linear-gradient(to right, #1c1b1b, transparent);
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+</style>
+</head>
+
+<body class="text-on-surface font-body selection:bg-primary selection:text-on-primary">
+
+<!-- ── Nav ── -->
+<nav class="fixed top-0 w-full z-50 bg-[#131313]/60 backdrop-blur-md border-b border-[#4edea3]/10 shadow-[0_0_20px_rgba(16,185,129,0.05)]">
+  <div class="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto">
+    <div class="text-xl font-bold tracking-tighter text-[#4edea3] font-headline">The Editorial Engineer</div>
+    <div class="hidden md:flex items-center gap-8">
+      <a class="font-headline font-bold tracking-tight" href="#hero">Hero</a>
+      <a class="font-headline font-bold tracking-tight" href="#about">About</a>
+      <a class="font-headline font-bold tracking-tight" href="#skills">Skills</a>
+      <a class="font-headline font-bold tracking-tight" href="#projects">Projects</a>
+      <a class="font-headline font-bold tracking-tight" href="#contact">Contact</a>
+    </div>
+    <a class="bg-primary text-on-primary px-6 py-2 font-headline font-bold text-sm scale-95 active:scale-90 transition-transform" href="https://github.com/mostafatamer11">GitHub <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free v7.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3 .3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5 .3-6.2 2.3zm44.2-1.7c-2.9 .7-4.9 2.6-4.6 4.9 .3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM252.8 8c-138.7 0-244.8 105.3-244.8 244 0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1 100-33.2 167.8-128.1 167.8-239 0-138.7-112.5-244-251.2-244zM105.2 352.9c-1.3 1-1 3.3 .7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3 .3 2.9 2.3 3.9 1.6 1 3.6 .7 4.3-.7 .7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3 .7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3 .7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- ── Hero ── -->
+  <section class="relative min-h-screen flex items-center px-8 pt-20 overflow-hidden" id="hero">
+    <div id="hero-glow" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+      <div id="hero-content" class="md:col-span-8 z-10">
+        <p class="font-mono text-primary mb-4 tracking-widest text-sm uppercase">Available for work</p>
+        <h1 class="text-6xl md:text-8xl font-headline font-bold tracking-tighter text-on-surface leading-[0.9] mb-6">
+          Mostafa <br/> <span class="text-primary">Ghobashy</span>
+        </h1>
+        <div class="flex flex-col gap-2 mb-10">
+          <p class="text-xl md:text-2xl font-headline font-medium text-on-surface-variant">Software Engineer · Web Developer</p>
+          <p class="text-on-surface-variant max-w-xl">I build high-performance, scalable solutions that work.</p>
+        </div>
+        <div class="flex flex-wrap gap-4">
+          <a class="bg-primary text-on-primary px-8 py-4 font-headline font-bold tracking-wide hover:brightness-110 transition-all flex items-center gap-2" href="#projects">
+            View Work <span class="material-symbols-outlined text-sm">arrow_forward</span>
+          </a>
+          <a class="border border-primary/20 text-primary px-8 py-4 font-headline font-bold tracking-wide hover:bg-primary/10 transition-all" href="#contact">Contact Me</a>
+        </div>
+      </div>
+      <div class="hidden md:block md:col-span-4 relative">
+        <div class="aspect-square border border-outline-variant/30 flex items-center justify-center relative">
+          <div class="absolute -top-4 -left-4 w-8 h-8 border-t-2 border-l-2 border-primary"></div>
+          <div class="absolute -bottom-4 -right-4 w-8 h-8 border-b-2 border-r-2 border-primary"></div>
+          <div class="font-mono text-[10px] text-outline opacity-40 leading-relaxed overflow-hidden p-4 select-none">
+            &lt;script&gt;<br/>
+            const engine = new PortfolioEngine({<br/>
+            &nbsp;&nbsp;performance: 'optimized',<br/>
+            &nbsp;&nbsp;aesthetic: 'editorial',<br/>
+            &nbsp;&nbsp;precision: 1.0<br/>
+            });<br/>
+            engine.render();<br/>
+            &lt;/script&gt;
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── About ── -->
+  <section class="min-h-screen py-24 px-8 bg-surface-container-low relative" id="about">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-16 items-start">
+        <div id="about-img" class="md:col-span-5 relative group">
+          <div class="relative z-10 overflow-hidden grayscale hover:grayscale-0 transition-all duration-700 aspect-[4/3] bg-surface-container-highest">
+            <div class="term-wrap">
+              <div class="term-bar">
+                <div class="dot dot-r"></div>
+                <div class="dot dot-y"></div>
+                <div class="dot dot-g"></div>
+                <span class="term-title">~/projects/client-app</span>
+              </div>
+              <div class="term-body" id="tbody"></div>
+            </div>
+          </div>
+          <div class="absolute inset-0 translate-x-4 translate-y-4 border-2 border-primary -z-0 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform"></div>
+          <div class="mt-8 flex items-center gap-4">
+            <span class="w-12 h-[1px] bg-primary/30"></span>
+            <div class="flex flex-col">
+              <span class="font-mono text-[10px] text-outline uppercase tracking-widest">Location</span>
+              <span class="text-on-surface font-headline font-bold">Egypt</span>
+            </div>
+          </div>
+        </div>
+        <div id="about-text" class="md:col-span-7 pt-12">
+          <h2 class="text-4xl md:text-5xl font-headline font-bold tracking-tight mb-8">
+            A minimalist approach to <br/> <span class="text-outline">complex systems.</span>
+          </h2>
+          <div class="space-y-6 text-on-surface-variant leading-relaxed text-lg max-w-2xl">
+            <p>I build the full picture — from the logic holding your data together to the interface your users actually touch. Over the past few years I've shipped SaaS products, internal tools, automations, and marketing sites for clients who needed someone that could own the whole thing.</p>
+            <p>What I care about most is understanding what you're actually trying to solve. The tech is a means to an end, and the best solutions usually come from asking the right questions before writing a single line of code.</p>
+            <p>We work together, iterate, and ship something that makes sense for your business — not just something that technically works.</p>
+          </div>
+          <div class="mt-12 flex items-center gap-4">
+            <div class="px-4 py-2 bg-primary/10 border border-primary/20 rounded-full flex items-center gap-2">
+              <span class="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+              <span class="text-primary font-headline font-bold text-xs uppercase tracking-widest">Currently Open for Freelance</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Skills ── -->
+  <section class="min-h-screen py-24 px-8 relative" id="skills">
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-20">
+        <span class="font-mono text-primary text-sm tracking-widest uppercase">Expertise</span>
+        <h2 class="text-5xl md:text-6xl font-headline font-bold tracking-tight mt-4">Technical Stack</h2>
+      </div>
+      <div id="skills-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="glass-card p-10 glow-hover transition-all duration-300">
+          <h3 class="font-headline font-bold text-xl mb-8 flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary">data_object</span> Frontend
+          </h3>
+          <div class="flex flex-wrap gap-3">
+            <span class="px-4 py-1.5 bg-surface-variant rounded-full text-xs font-headline font-bold uppercase tracking-widest text-on-surface-variant">ShadCN</span>
+            <span class="px-4 py-1.5 bg-surface-variant rounded-full text-xs font-headline font-bold uppercase tracking-widest text-on-surface-variant">Jinja</span>
+            <span class="px-4 py-1.5 bg-surface-variant rounded-full text-xs font-headline font-bold uppercase tracking-widest text-on-surface-variant">Tailwind</span>
+            <span class="px-4 py-1.5 bg-surface-variant rounded-full text-xs font-headline font-bold uppercase tracking-widest text-on-surface-variant">SCSS</span>
+          </div>
+        </div>
+        <div class="glass-card p-10 glow-hover transition-all duration-300">
+          <h3 class="font-headline font-bold text-xl mb-8 flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary">terminal</span> Backend
+          </h3>
+          <div class="flex flex-wrap gap-3">
+            <span class="px-4 py-1.5 bg-surface-variant rounded-full text-xs font-headline font-bold uppercase tracking-widest text-on-surface-variant">DRF</span>
+            <span class="px-4 py-1.5 bg-surface-variant rounded-full text-xs font-headline font-bold uppercase tracking-widest text-on-surface-variant">Python</span>
+            <span class="px-4 py-1.5 bg-surface-variant rounded-full text-xs font-headline font-bold uppercase tracking-widest text-on-surface-variant">SQL</span>
+            <span class="px-4 py-1.5 bg-surface-variant rounded-full text-xs font-headline font-bold uppercase tracking-widest text-on-surface-variant">NoSQL</span>
+            <span class="px-4 py-1.5 bg-surface-variant rounded-full text-xs font-headline font-bold uppercase tracking-widest text-on-surface-variant">REST</span>
+            <span class="px-4 py-1.5 bg-surface-variant rounded-full text-xs font-headline font-bold uppercase tracking-widest text-on-surface-variant">Auth</span>
+            <span class="px-4 py-1.5 bg-surface-variant rounded-full text-xs font-headline font-bold uppercase tracking-widest text-on-surface-variant">Supabase</span>
+          </div>
+        </div>
+        <div class="glass-card p-10 glow-hover transition-all duration-300">
+          <h3 class="font-headline font-bold text-xl mb-8 flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary">settings_ethernet</span> Infrastructure
+          </h3>
+          <div class="flex flex-wrap gap-3">
+            <span class="px-4 py-1.5 bg-surface-variant rounded-full text-xs font-headline font-bold uppercase tracking-widest text-on-surface-variant">Git/GitHub</span>
+            <span class="px-4 py-1.5 bg-surface-variant rounded-full text-xs font-headline font-bold uppercase tracking-widest text-on-surface-variant">Nginx</span>
+            <span class="px-4 py-1.5 bg-surface-variant rounded-full text-xs font-headline font-bold uppercase tracking-widest text-on-surface-variant">CI/CD</span>
+            <span class="px-4 py-1.5 bg-surface-variant rounded-full text-xs font-headline font-bold uppercase tracking-widest text-on-surface-variant">Docker</span>
+            <span class="px-4 py-1.5 bg-surface-variant rounded-full text-xs font-headline font-bold uppercase tracking-widest text-on-surface-variant">VPS</span>
+          </div>
+        </div>
+      </div>
+      <div class="mt-32 flex justify-center items-center gap-4">
+        <span class="w-24 h-[1px] bg-primary/20"></span>
+        <div class="w-2 h-2 rounded-full border border-primary/40"></div>
+        <span class="w-24 h-[1px] bg-primary/20"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Projects ── -->
+  <section class="py-24 px-8 relative bg-surface-container-low" id="projects">
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-16 flex items-end justify-between">
+        <div>
+          <span class="font-mono text-primary text-sm tracking-widest uppercase">Selected Work</span>
+          <h2 class="text-5xl md:text-6xl font-headline font-bold tracking-tight mt-4">Projects</h2>
+        </div>
+        <div class="hidden md:flex items-center gap-3">
+          <button class="carousel-btn" id="proj-prev" disabled>
+            <span class="material-symbols-outlined text-xl">arrow_back</span>
+          </button>
+          <button class="carousel-btn" id="proj-next">
+            <span class="material-symbols-outlined text-xl">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+      <div class="relative overflow-hidden" id="proj-viewport">
+        <div class="carousel-fade-left" id="proj-fade-left"></div>
+        <div class="projects-track" id="proj-track"></div>
+        <div class="carousel-fade-right"></div>
+      </div>
+      <div class="mt-8 flex items-center gap-4">
+        <div class="carousel-dots" id="proj-dots"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Contact ── -->
+  <section class="min-h-screen py-24 px-8 relative overflow-hidden" id="contact">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-20">
+      <div>
+        <h2 class="text-6xl font-headline font-bold tracking-tighter mb-8 leading-none">
+          Let's start <br/> <span class="text-primary">something new.</span>
+        </h2>
+        <p class="text-on-surface-variant text-lg mb-12 max-w-md">Have a project in mind or just want to chat about tech? Drop me a message and I'll get back to you within 24 hours.</p>
+        <div class="space-y-8">
+          <div class="flex items-center gap-6 group">
+            <div class="w-14 h-14 glass-card flex items-center justify-center group-hover:border-primary/40 transition-colors">
+              <span class="material-symbols-outlined text-primary">mail</span>
+            </div>
+            <div>
+              <p class="text-[10px] uppercase tracking-[0.2em] font-headline font-bold text-outline">Email Me</p>
+              <p class="text-lg font-headline font-bold">hello@yourdomain.com</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-6 group">
+            <div class="w-14 h-14 glass-card flex items-center justify-center group-hover:border-primary/40 transition-colors">
+              <span class="material-symbols-outlined text-primary">share</span>
+            </div>
+            <div class="flex gap-4">
+              <a class="text-on-surface-variant hover:text-primary transition-colors font-mono text-sm uppercase" href="#">GitHub</a>
+              <span class="text-outline">/</span>
+              <a class="text-on-surface-variant hover:text-primary transition-colors font-mono text-sm uppercase" href="#">LinkedIn</a>
+              <span class="text-outline">/</span>
+              <a class="text-on-surface-variant hover:text-primary transition-colors font-mono text-sm uppercase" href="#">X</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="glass-card p-10 relative">
+        <form class="space-y-8" name="contact" method="POST" data-netlify="true">
+          <div>
+            <label class="block font-headline font-bold text-xs uppercase tracking-widest mb-3 text-outline">Name</label>
+            <input class="w-full bg-surface-container-lowest border-0 border-b border-outline-variant py-4 px-0 focus:ring-0 focus:border-primary text-on-surface transition-all placeholder:text-outline" placeholder="John Doe" type="text" name="name"/>
+          </div>
+          <div>
+            <label class="block font-headline font-bold text-xs uppercase tracking-widest mb-3 text-outline">Email Address</label>
+            <input class="w-full bg-surface-container-lowest border-0 border-b border-outline-variant py-4 px-0 focus:ring-0 focus:border-primary text-on-surface transition-all placeholder:text-outline" placeholder="john@example.com" type="email" name="email"/>
+          </div>
+          <div>
+            <label class="block font-headline font-bold text-xs uppercase tracking-widest mb-3 text-outline">Your Message</label>
+            <textarea class="w-full bg-surface-container-lowest border-0 border-b border-outline-variant py-4 px-0 focus:ring-0 focus:border-primary text-on-surface transition-all placeholder:text-outline resize-none" placeholder="How can I help you?" rows="4" name="message"></textarea>
+          </div>
+          <button class="w-full bg-primary text-on-primary py-5 font-headline font-bold uppercase tracking-widest text-sm shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] transition-all">Send Message</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ── Footer ── -->
+<footer class="bg-[#131313] w-full py-12 px-8 border-t border-[#4edea3]/20">
+  <div class="flex flex-col md:flex-row justify-between items-center gap-6 max-w-7xl mx-auto">
+    <p class="font-['Space_Grotesk'] text-xs uppercase tracking-widest text-[#bbcabf]">© 2024 The Editorial Engineer. Built with Precision.</p>
+    <div class="flex gap-8">
+      <a class="font-['Space_Grotesk'] text-xs uppercase tracking-widest text-[#bbcabf] hover:text-[#4edea3] transition-all opacity-80 hover:opacity-100" href="#">GitHub</a>
+      <a class="font-['Space_Grotesk'] text-xs uppercase tracking-widest text-[#bbcabf] hover:text-[#4edea3] transition-all opacity-80 hover:opacity-100" href="#">LinkedIn</a>
+      <a class="font-['Space_Grotesk'] text-xs uppercase tracking-widest text-[#bbcabf] hover:text-[#4edea3] transition-all opacity-80 hover:opacity-100" href="#">X</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── Parallax & scroll reveals ──
+(function() {
+  var heroGlow   = document.getElementById('hero-glow');
+  var heroContent= document.getElementById('hero-content');
+  var aboutImg   = document.getElementById('about-img');
+  var aboutText  = document.getElementById('about-text');
+  var skillsGrid = document.getElementById('skills-grid');
+  var aboutSec   = document.getElementById('about');
+  var skillsSec  = document.getElementById('skills');
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function getTop(el) { var t = 0; while (el) { t += el.offsetTop; el = el.offsetParent; } return t; }
+
+  var cur = { glow:0, hero:0, aImg:0, aTxt:0, sk:0 };
+  var tgt = { glow:0, hero:0, aImg:0, aTxt:0, sk:0 };
+
+  function setupReveal(el) {
+    if (!el) return;
+    el.style.opacity = '0';
+    el.style.transition = 'opacity 0.9s cubic-bezier(0.16,1,0.3,1)';
+    var io = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting) { el.style.opacity = '1'; io.disconnect(); }
+    }, { threshold: 0.1 });
+    io.observe(el);
+  }
+  setupReveal(aboutImg);
+  setupReveal(aboutText);
+
+  document.querySelectorAll('#skills-grid .glass-card').forEach(function(card, i) {
+    card.style.opacity = '0';
+    card.style.transition = 'opacity 0.8s cubic-bezier(0.16,1,0.3,1) ' + (i * 0.15) + 's';
+    var io = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting) { card.style.opacity = '1'; io.disconnect(); }
+    }, { threshold: 0.1 });
+    io.observe(card);
+  });
+
+  function tick() {
+    var sy   = window.scrollY;
+    var aTop = aboutSec  ? getTop(aboutSec)  : 0;
+    var sTop = skillsSec ? getTop(skillsSec) : 0;
+    tgt.glow = sy * 0.45;
+    tgt.hero = sy * 0.22;
+    tgt.aImg = (sy - aTop) * 0.16;
+    tgt.aTxt = (sy - aTop) * 0.09;
+    tgt.sk   = (sy - sTop) * 0.11;
+    for (var k in cur) cur[k] = lerp(cur[k], tgt[k], 0.075);
+    if (heroGlow)    heroGlow.style.transform    = 'translate(-50%, calc(-50% + ' + cur.glow.toFixed(1) + 'px))';
+    if (heroContent) heroContent.style.transform = 'translateY(' + cur.hero.toFixed(1) + 'px)';
+    if (aboutImg)    aboutImg.style.transform    = 'translateY(' + cur.aImg.toFixed(1) + 'px)';
+    if (aboutText)   aboutText.style.transform   = 'translateY(' + cur.aTxt.toFixed(1) + 'px)';
+    if (skillsGrid)  skillsGrid.style.transform  = 'translateY(' + cur.sk.toFixed(1) + 'px)';
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+
+// ── Smooth scroll with nav offset ──
+document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+  anchor.addEventListener('click', function(e) {
+    e.preventDefault();
+    var target = document.querySelector(this.getAttribute('href'));
+    if (!target) return;
+    var navHeight = document.querySelector('nav').offsetHeight;
+    var top = target.getBoundingClientRect().top + window.scrollY - navHeight - 16;
+    window.scrollTo({ top: top, behavior: 'smooth' });
+  });
+});
+
+// ── Active nav highlight ──
+(function() {
+  var navLinks = document.querySelectorAll('nav a[href^="#"]');
+  var active   = 'text-[#4edea3] border-b-2 border-[#4edea3] pb-1';
+  var inactive = 'text-[#bbcabf] hover:text-[#4edea3] transition-colors';
+
+  function setActive(id) {
+    navLinks.forEach(function(link) {
+      var isActive = link.getAttribute('href') === '#' + id;
+      link.className = 'font-headline font-bold tracking-tight ' + (isActive ? active : inactive);
+    });
+  }
+
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
+
+  document.querySelectorAll('main section[id]').forEach(function(s) { observer.observe(s); });
+})();
+
+// ── Terminal animation ──
+(function() {
+  var lines = [
+    { type: 'cmd', prompt: true, text: 'git init client-app && cd client-app' },
+    { type: 'out', text: 'Initialized empty Git repository' },
+    { type: 'cmd', prompt: true, text: 'pip install flask gunicorn psycopg2' },
+    { type: 'out', text: 'Successfully installed flask gunicorn psycopg2' },
+    { type: 'cmd', prompt: true, text: 'docker compose up -d postgres redis' },
+    { type: 'out', cls: 'teal', text: '✓  postgres   running on :5432' },
+    { type: 'out', cls: 'teal', text: '✓  redis      running on :6379' },
+    { type: 'cmd', prompt: true, text: 'flask db migrate && flask db upgrade' },
+    { type: 'out', cls: 'green', text: 'Running migrations... done.' },
+    { type: 'cmd', prompt: true, text: 'python worker.py &' },
+    { type: 'out', cls: 'amber', text: '[1] background worker started' },
+    { type: 'cmd', prompt: true, text: 'gunicorn -w 4 -b 0.0.0.0:8000 app:app' },
+    { type: 'out', cls: 'teal', text: '[INFO] Listening at: http://0.0.0.0:8000' },
+    { type: 'out', cls: 'blue', text: '[INFO] 4 workers booted — ready.' },
+    { type: 'cmd', prompt: true, text: 'gh workflow run deploy.yml' },
+    { type: 'out', cls: 'green', text: '✓  CI passed — deploying to production' },
+    { type: 'out', cls: 'teal', text: '✓  Live at https://yourdomain.com' },
+  ];
+
+  var tbody   = document.getElementById('tbody');
+  var lineEls = [];
+  var cursorEl = document.createElement('span');
+  cursorEl.className = 'cursor';
+
+  lines.forEach(function() {
+    var el = document.createElement('div');
+    el.className = 'line';
+    tbody.appendChild(el);
+    lineEls.push(el);
+  });
+
+  function renderLine(el, line, typed) {
+    el.innerHTML = '';
+    if (line.prompt) {
+      var p = document.createElement('span');
+      p.className = 'prompt';
+      p.textContent = '❯ ';
+      el.appendChild(p);
+    }
+    var span = document.createElement('span');
+    span.className = line.prompt ? 'cmd' : (line.cls || 'out');
+    span.textContent = typed;
+    el.appendChild(span);
+  }
+
+  function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
+
+  async function typeLine(idx) {
+    var line = lines[idx];
+    var el   = lineEls[idx];
+    el.classList.add('visible');
+    if (line.prompt) {
+      el.appendChild(cursorEl);
+      var typed = '';
+      for (var c of line.text.split('')) {
+        typed += c;
+        renderLine(el, line, typed);
+        el.appendChild(cursorEl);
+        await sleep(38 + Math.random() * 30);
+      }
+      await sleep(180);
+      if (cursorEl.parentNode === el) el.removeChild(cursorEl);
+    } else {
+      renderLine(el, line, line.text);
+      await sleep(60);
+    }
+  }
+
+  async function run() {
+    await sleep(600);
+    for (var i = 0; i < lines.length; i++) {
+      await typeLine(i);
+      await sleep(lines[i].prompt ? 320 : 80);
+    }
+    lineEls[lineEls.length - 1].appendChild(cursorEl);
+  }
+
+  run();
+})();
+
+// ── Projects carousel ──
+(function() {
+  var track    = document.getElementById('proj-track');
+  var viewport = document.getElementById('proj-viewport');
+  var btnPrev  = document.getElementById('proj-prev');
+  var btnNext  = document.getElementById('proj-next');
+  var dotsEl   = document.getElementById('proj-dots');
+  var fadeLeft = document.getElementById('proj-fade-left');
+  var projects = [];
+  var current  = 0;
+
+  function cardWidth() {
+    var card = track.querySelector('.project-card');
+    return card ? card.offsetWidth + 32 : 436;
+  }
+
+  function renderProjects(data) {
+    track.innerHTML = '';
+    dotsEl.innerHTML = '';
+    projects = data;
+    data.forEach(function(p, i) {
+      var card = document.createElement('div');
+      card.className = 'project-card';
+      card.innerHTML =
+        (p.thumbnail_url
+          ? '<img class="project-thumb" src="' + p.thumbnail_url + '" alt="' + p.title + '" loading="lazy"/>'
+          : '<div class="project-thumb-placeholder"><span style="font-family:\'JetBrains Mono\',monospace;color:#3fb950;font-size:11px;">❯ ' + p.title.toLowerCase().replace(/\s+/g,'-') + '</span></div>'
+        ) +
+        '<div class="project-body">' +
+          '<div class="project-tags">' + (p.tags||[]).map(function(t){ return '<span class="project-tag">'+t+'</span>'; }).join('') + '</div>' +
+          '<div class="project-title">' + p.title + '</div>' +
+          '<div class="project-desc">' + (p.description||'') + '</div>' +
+          '<div class="project-links">' +
+            (p.live_url   ? '<a class="project-link primary" href="'+p.live_url+'" target="_blank"><span class="material-symbols-outlined" style="font-size:14px;">open_in_new</span> Live</a>' : '') +
+            (p.github_url ? '<a class="project-link" href="'+p.github_url+'" target="_blank"><span class="material-symbols-outlined" style="font-size:14px;">code</span> Code</a>' : '') +
+          '</div>' +
+        '</div>';
+      track.appendChild(card);
+
+      var dot = document.createElement('div');
+      dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+      dot.addEventListener('click', function() { goTo(i); });
+      dotsEl.appendChild(dot);
+    });
+    goTo(0);
+  }
+
+  function goTo(idx) {
+    current = Math.max(0, Math.min(idx, projects.length - 1));
+    track.style.transform = 'translateX(-' + (current * cardWidth()) + 'px)';
+    document.querySelectorAll('.carousel-dot').forEach(function(d, i) {
+      d.classList.toggle('active', i === current);
+    });
+    btnPrev.disabled = current === 0;
+    btnNext.disabled = current >= projects.length - 1;
+    fadeLeft.style.opacity = current > 0 ? '1' : '0';
+  }
+
+  btnPrev.addEventListener('click', function() { goTo(current - 1); });
+  btnNext.addEventListener('click', function() { goTo(current + 1); });
+  window.addEventListener('resize', function() { goTo(current); });
+
+  var touchStartX = 0;
+  viewport.addEventListener('touchstart', function(e) { touchStartX = e.touches[0].clientX; }, { passive: true });
+  viewport.addEventListener('touchend', function(e) {
+    var diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) goTo(current + (diff > 0 ? 1 : -1));
+  });
+
+  fetch('projects.json')
+    .then(function(r) { return r.json(); })
+    .then(function(data) { renderProjects(data.sort(function(a,b){ return a.order_index - b.order_index; })); })
+    .catch(function() { track.innerHTML = '<p style="color:#8b949e;font-family:monospace;padding:2rem;">Add projects via admin.html</p>'; });
+})();
+</script>
+
+</body>
+</html>
